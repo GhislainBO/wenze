@@ -1,8 +1,8 @@
-"""WENZE mobile — Kivy onboarding (Phase 1).
+"""WENZE mobile — Kivy app entry point.
 
 First launch shows a one-tap city picker (Kinshasa / Brazzaville). The choice
-is persisted locally and never asked again. A tiny placeholder "home" screen
-confirms the selection for now; the real home view will arrive in Phase 2.
+is persisted locally and never asked again. Once a city is chosen, the app
+lands on the services listing screen (Phase 2A).
 
 Constraints (PRD section 7):
 - No KivyMD.
@@ -16,6 +16,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 
+from services_screen import build_services_screen
 from storage import load_city, save_city
 
 
@@ -54,21 +55,6 @@ def build_onboarding(on_select) -> BoxLayout:
     return root
 
 
-def build_home_placeholder(country: str, city: str) -> BoxLayout:
-    """Temporary screen shown after a city has been chosen."""
-    flag = "🇨🇩" if country == "RDC" else "🇨🇬"
-    root = BoxLayout(orientation="vertical", padding=40, spacing=16)
-    root.add_widget(Label(
-        text=f"Bienvenue à {city} {flag}",
-        font_size="24sp",
-    ))
-    root.add_widget(Label(
-        text="(Écran d'accueil — à venir dans la prochaine phase)",
-        font_size="14sp",
-    ))
-    return root
-
-
 # --- App ------------------------------------------------------------------
 
 class WenzeApp(App):
@@ -85,7 +71,7 @@ class WenzeApp(App):
         saved = load_city(self.user_data_dir)
         if saved is not None:
             self._container.add_widget(
-                build_home_placeholder(saved["country"], saved["city"])
+                build_services_screen(saved["country"], saved["city"])
             )
         else:
             self._container.add_widget(build_onboarding(self._on_city_selected))
