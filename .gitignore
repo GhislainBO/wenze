@@ -1,0 +1,43 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+
+# --- SQLite databases (runtime data, not source) ---
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# --- Kivy / Buildozer ---
+.buildozer/
+bin/
+*.kv~
+
+# --- IDE / editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- MS Office lock files ---
+~$*
+
+
+# --- Claude Code local workspace ---
+.claude/
