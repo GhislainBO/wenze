@@ -38,9 +38,10 @@ Thumbs.db
 # --- MS Office lock files ---
 ~$*
 
-# --- Source spec documents (kept only as PRD.md in the repo) ---
+# --- Source spec documents (PRD.md is the single source of truth) ---
 Cahier_des_charges_WENZE_v1.0.docx
 Cahier_des_charges_WENZE_v1.0.pdf
+Cahier_des_charges_WENZE_v1_0_EN.md
 
 
 # --- Claude Code local workspace ---
