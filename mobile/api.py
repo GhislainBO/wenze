@@ -1,6 +1,6 @@
 """Thin HTTP client for the WENZE backend.
 
-Stdlib-only on purpose — no new dependencies (PRD section 7). Calls are
+Stdlib-only on purpose - no new dependencies (PRD section 7). Calls are
 synchronous; the UI layer runs them in a worker thread and marshals the
 result back to the Kivy main loop via `Clock.schedule_once`.
 """
@@ -22,7 +22,7 @@ _REQUEST_TIMEOUT_SECONDS = 10
 def fetch_services(country: str, city_village: str) -> List[dict]:
     """Return the list of services for the given city.
 
-    Raises on any network, HTTP or JSON error — the caller (services_screen)
+    Raises on any network, HTTP or JSON error - the caller (services_screen)
     catches and renders the error state.
     """
     query = urlencode({"country": country, "city_village": city_village})
@@ -32,6 +32,23 @@ def fetch_services(country: str, city_village: str) -> List[dict]:
     data = json.loads(payload)
     if not isinstance(data, list):
         raise ValueError("Unexpected response shape: expected a list")
+    return data
+
+
+def create_service(payload: dict) -> dict:
+    """POST a new service. Returns the created Service dict; raises on failure."""
+    url = f"{API_BASE_URL}/services"
+    body = json.dumps(payload).encode("utf-8")
+    req = Request(
+        url,
+        data=body,
+        method="POST",
+        headers={"Content-Type": "application/json"},
+    )
+    with urlopen(req, timeout=_REQUEST_TIMEOUT_SECONDS) as response:
+        data = json.loads(response.read().decode("utf-8"))
+    if not isinstance(data, dict):
+        raise ValueError("Unexpected response shape: expected an object")
     return data
 
 

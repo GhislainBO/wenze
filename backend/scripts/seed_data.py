@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlmodel import Session, delete  # noqa: E402
 
-from app.database import engine, init_db  # noqa: E402
+from app.database import _ensure_anonymous_user, engine, init_db  # noqa: E402
 from app.models import Category, Service, ServiceStatus, User  # noqa: E402
 
 
@@ -353,6 +353,9 @@ def seed() -> None:
         for service in KINSHASA_SERVICES + BRAZZAVILLE_SERVICES:
             session.add(service)
         session.commit()
+
+    # Keep the placeholder user around so mobile POSTs still work after reseed.
+    _ensure_anonymous_user()
 
     total = len(KINSHASA_SERVICES) + len(BRAZZAVILLE_SERVICES)
     print(f"Seeded {len(USERS)} users and {total} services "

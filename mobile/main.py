@@ -1,4 +1,4 @@
-"""WENZE mobile — Kivy app entry point.
+"""WENZE mobile - Kivy app entry point.
 
 First launch shows a one-tap city picker (Kinshasa / Brazzaville). The choice
 is persisted locally and never asked again. Once a city is chosen, the app
@@ -16,11 +16,12 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 
+from publish_screen import build_publish_screen
 from services_screen import build_services_screen
 from storage import load_city, save_city
 
 
-# --- UI builders (pure functions — easier to test, keep UI layer thin) -----
+# --- UI builders (pure functions - easier to test, keep UI layer thin) -----
 
 def build_onboarding(on_select) -> BoxLayout:
     """Screen shown on first launch (PRD section 2)."""
@@ -69,12 +70,28 @@ class WenzeApp(App):
     def _render(self) -> None:
         self._container.clear_widgets()
         saved = load_city(self.user_data_dir)
-        if saved is not None:
-            self._container.add_widget(
-                build_services_screen(saved["country"], saved["city"])
-            )
-        else:
+        if saved is None:
             self._container.add_widget(build_onboarding(self._on_city_selected))
+            return
+        self._container.add_widget(build_services_screen(
+            saved["country"],
+            saved["city"],
+            on_publish=self._show_publish,
+        ))
+
+    def _show_publish(self) -> None:
+        saved = load_city(self.user_data_dir)
+        if saved is None:
+            # Shouldn't happen - guard anyway.
+            self._render()
+            return
+        self._container.clear_widgets()
+        self._container.add_widget(build_publish_screen(
+            country=saved["country"],
+            city=saved["city"],
+            on_back=self._render,
+            on_published=self._render,
+        ))
 
     def _on_city_selected(self, country: str, city: str) -> None:
         save_city(self.user_data_dir, country, city)
