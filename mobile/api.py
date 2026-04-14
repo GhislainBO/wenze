@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 from typing import List
 from urllib.parse import urlencode
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 # NOTE: 127.0.0.1 works for desktop testing (WSL / localhost).
 # Change this to the host machine's LAN IP (e.g. "http://192.168.1.42:8000")
@@ -33,3 +33,12 @@ def fetch_services(country: str, city_village: str) -> List[dict]:
     if not isinstance(data, list):
         raise ValueError("Unexpected response shape: expected a list")
     return data
+
+
+def log_service_click(service_id: str) -> None:
+    """Fire-and-forget POST used for analytics. Raises on any failure;
+    the caller runs this in a daemon thread and swallows exceptions."""
+    url = f"{API_BASE_URL}/services/{service_id}/log-click"
+    req = Request(url, data=b"", method="POST")
+    with urlopen(req, timeout=_REQUEST_TIMEOUT_SECONDS) as response:
+        response.read()

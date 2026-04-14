@@ -6,8 +6,12 @@ and widgets are only mutated on the Kivy main loop via Clock.
 """
 from __future__ import annotations
 
+import logging
+import subprocess
 import threading
-from typing import List
+import webbrowser
+from typing import List, Optional
+from urllib.parse import quote
 
 from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
@@ -16,7 +20,12 @@ from kivy.uix.label import Label
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.widget import Widget
 
-from api import fetch_services
+from api import fetch_services, log_service_click
+
+_LOG = logging.getLogger(__name__)
+
+# Country → WhatsApp country code (digits only, no '+').
+_COUNTRY_CODE = {"RDC": "243", "RC": "242"}
 
 
 # Emoji-per-category mapping (PRD section 3.2). Categories unknown to this
@@ -49,12 +58,85 @@ def _category_label(category: str) -> str:
     return f"{emoji} {category}".strip()
 
 
-def create_service_card(service: dict, country: str) -> Widget:
-    """One fixed-height card. Plain labels + an inert 'Contacter' button.
+def normalize_phone_number(service: dict, country: str) -> Optional[str]:
+    """Return a wa.me-ready digit string (no '+'), or None if unusable."""
+    raw = service.get("whatsapp_number") or service.get("phone_number") or ""
+    digits = "".join(ch for ch in raw if ch.isdigit())
+    if not digits:
+        return None
+    if digits.startswith(("243", "242")):
+        return digits
+    code = _COUNTRY_CODE.get(country)
+    if code is None:
+        return None
+    if digits.startswith("0"):
+        digits = digits[1:]
+    return f"{code}{digits}"
 
-    The button is deliberately inert in Phase 2A; WhatsApp wiring lands
-    in Phase 2B.
-    """
+
+def build_whatsapp_url(service: dict, country: str) -> Optional[str]:
+    number = normalize_phone_number(service, country)
+    if not number:
+        return None
+    title = service.get("title", "")
+    message = f"Bonjour, je vous contacte via WENZE pour votre service : {title}"
+    return f"https://wa.me/{number}?text={quote(message)}"
+
+
+def open_whatsapp(url: str) -> bool:
+    """Try WSL → native Linux → Python webbrowser; return True on first success."""
+    # Empty "" after `start` is the window-title placeholder; without it,
+    # cmd.exe may treat a quoted URL as the title.
+    attempts = (
+        ["cmd.exe", "/c", "start", "", url],
+        ["xdg-open", url],
+    )
+    for cmd in attempts:
+        try:
+            subprocess.run(
+                cmd, check=True,
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            )
+            return True
+        except (FileNotFoundError, subprocess.CalledProcessError):
+            continue
+    try:
+        return webbrowser.open(url)
+    except Exception as exc:  # noqa: BLE001
+        _LOG.info("webbrowser.open failed: %s", exc)
+        return False
+
+
+def log_click(service_id: str) -> None:
+    """Fire POST in a daemon thread; never blocks the UI, never raises."""
+    if not service_id:
+        return
+
+    def _worker() -> None:
+        try:
+            log_service_click(service_id)
+        except Exception as exc:  # noqa: BLE001 — fail silently per spec
+            _LOG.info("log_click failed for %s: %s", service_id, exc)
+
+    threading.Thread(target=_worker, daemon=True).start()
+
+
+def _show_unavailable(card: BoxLayout, button: Button) -> None:
+    """Flash a French message on the button for 2s, then restore it."""
+    original = button.text
+    button.text = "Numéro WhatsApp indisponible."
+    button.disabled = True
+
+    def _restore(_dt: float) -> None:
+        button.text = original
+        button.disabled = False
+
+    Clock.schedule_once(_restore, 2.0)
+
+
+def create_service_card(service: dict, country: str) -> Widget:
+    """One fixed-height card. Plain labels + a 'Contacter' button wired
+    to WhatsApp (Phase 2B)."""
     card = BoxLayout(
         orientation="vertical",
         padding=[16, 12, 16, 12],
@@ -95,8 +177,20 @@ def create_service_card(service: dict, country: str) -> Widget:
         size_hint_y=None,
         height=48,
     )
-    # Phase 2B will wire this to WhatsApp + log-click.
-    contact_btn.bind(on_release=lambda *_: None)
+
+    def _on_contact(_btn: Button) -> None:
+        try:
+            url = build_whatsapp_url(service, country)
+        except Exception as exc:  # noqa: BLE001 — never crash the UI
+            _LOG.info("build_whatsapp_url failed: %s", exc)
+            url = None
+        if not url:
+            _show_unavailable(card, contact_btn)
+            return
+        log_click(service.get("id", ""))
+        open_whatsapp(url)
+
+    contact_btn.bind(on_release=_on_contact)
     card.add_widget(contact_btn)
 
     return card
