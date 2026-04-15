@@ -17,16 +17,23 @@ from sqlmodel import Field, Relationship, SQLModel
 
 
 class Category(str, Enum):
-    """Service categories — French labels preserved for UI rendering."""
+    """Official WENZE service categories (single source of truth).
+
+    The 10 labels below are the only values accepted by the API and stored
+    in SQLite. Mobile mirrors this list in publish_screen.CATEGORIES; if you
+    add or rename a category here, update that constant too.
+    """
 
     SOUTIEN_SCOLAIRE = "Soutien scolaire"
-    ELECTRICITE_MACONNERIE = "Électricité & Maçonnerie"
+    REPARATIONS_TRAVAUX = "Réparations & Travaux"
     BEAUTE_COIFFURE = "Beauté & Coiffure"
-    JARDINAGE = "Jardinage"
-    PECHE_CHASSE = "Pêche & Chasse"
-    RESTAURATION_PROMO = "Restauration & Promo"
+    JARDINAGE_ENTRETIEN = "Jardinage & Entretien"
+    RESTAURATION_BONS_PLANS = "Restauration & Bons plans"
     TRANSPORT_LIVRAISON = "Transport & Livraison"
     TELEPHONE_INFORMATIQUE = "Téléphone & Informatique"
+    AIDE_MENAGERE_LESSIVE = "Aide ménagère & Lessive"
+    MENUISERIE_SOUDURE = "Menuiserie & Soudure"
+    MECANIQUE_AUTO_LAVAGE = "Mécanique auto & Lavage"
 
 
 class ServiceStatus(str, Enum):

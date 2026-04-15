@@ -11,6 +11,11 @@
 - **Code (variables, functions, comments):** In English
 - **Full product requirements:** See [PRD.md](PRD.md)
 
+## Deferred features
+
+- Image upload: postponed - requires persistent storage
+  solution (Cloudinary or Supabase Storage) before implementation
+
 ## GitHub
 
 - GitHub account: GhislainBO

@@ -61,18 +61,20 @@ def is_active_boost(service: dict) -> bool:
     return expiry > datetime.now()
 
 
-# Emoji-per-category mapping (PRD section 3.2). Categories unknown to this
-# map render as text only - satisfies "emoji if rendering works, otherwise
-# text only" without runtime font-capability detection.
-CATEGORY_EMOJI = {
-    "Soutien scolaire": "📚",
-    "Électricité & Maçonnerie": "🔧",
+# Official categories -> emoji glyph. Kept for future use (PRD section 3.2);
+# emojis render as squares on Kivy/WSL today, so the UI shows text only.
+# Mirrors backend Category enum (single source of truth).
+CATEGORY_EMOJIS = {
+    "Soutien scolaire": "👨\u200d🏫",
+    "Réparations & Travaux": "🔧",
     "Beauté & Coiffure": "💇",
-    "Jardinage": "🌿",
-    "Pêche & Chasse": "🎣",
-    "Restauration & Promo": "🍽️",
-    "Transport & Livraison": "🚗",
+    "Jardinage & Entretien": "🌿",
+    "Restauration & Bons plans": "🍲",
+    "Transport & Livraison": "🚚",
     "Téléphone & Informatique": "📱",
+    "Aide ménagère & Lessive": "🧹",
+    "Menuiserie & Soudure": "🪑",
+    "Mécanique auto & Lavage": "🚗",
 }
 
 _CARD_HEIGHT = 180
@@ -94,8 +96,9 @@ def _format_price(price: int, country: str) -> str:
 
 
 def _category_label(category: str) -> str:
-    emoji = CATEGORY_EMOJI.get(category, "")
-    return f"{emoji} {category}".strip()
+    # Emojis render as squares on Kivy/WSL; show text only. The mapping is
+    # kept in CATEGORY_EMOJIS for the day we have a font that supports them.
+    return category
 
 
 def normalize_phone_number(service: dict, country: str) -> Optional[str]:

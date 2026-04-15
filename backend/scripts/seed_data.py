@@ -1,8 +1,6 @@
 """Seed the WENZE database with realistic demo data (PRD section 4.3).
 
-20 services total:
-  - 10 in Kinshasa (RDC), prices in CDF
-  - 10 in Brazzaville (RC), prices in FCFA
+20 services total: 2 per official category (1 Kinshasa RDC + 1 Brazzaville RC).
 A few prices are set to 0 so the UI renders the French label "À discuter".
 All user-facing text (titles, descriptions, cities, neighborhoods) is in French.
 
@@ -83,7 +81,7 @@ USERS = [
 _BOOST_UNTIL = datetime.utcnow() + timedelta(days=7)
 
 
-# --- Kinshasa services (RDC, CDF) ------------------------------------------
+# --- Kinshasa services (RDC, CDF) - one per official category --------------
 
 KINSHASA_SERVICES = [
     Service(
@@ -103,7 +101,7 @@ KINSHASA_SERVICES = [
     Service(
         user_id=USERS[1].id,
         title="Installation électrique maison",
-        category=Category.ELECTRICITE_MACONNERIE,
+        category=Category.REPARATIONS_TRAVAUX,
         description="Tableau, prises, câblage complet. Devis gratuit.",
         price=25000,
         country="RDC",
@@ -127,7 +125,7 @@ KINSHASA_SERVICES = [
     Service(
         user_id=USERS[0].id,
         title="Entretien de jardin mensuel",
-        category=Category.JARDINAGE,
+        category=Category.JARDINAGE_ENTRETIEN,
         description="Tonte, taille de haies, désherbage. Forfait adaptable.",
         price=0,  # À discuter
         country="RDC",
@@ -137,21 +135,9 @@ KINSHASA_SERVICES = [
         phone_number="+243811234567",
     ),
     Service(
-        user_id=USERS[1].id,
-        title="Poisson frais du fleuve livré",
-        category=Category.PECHE_CHASSE,
-        description="Capitaine, ngolo, tilapia. Livraison le matin.",
-        price=8000,
-        country="RDC",
-        city_village="Kinshasa",
-        neighborhood="Kintambo",
-        whatsapp_number="+243821234567",
-        phone_number="+243821234567",
-    ),
-    Service(
         user_id=USERS[2].id,
         title="Plats congolais à emporter",
-        category=Category.RESTAURATION_PROMO,
+        category=Category.RESTAURATION_BONS_PLANS,
         description="Pondu, madesu, riz au poisson. Menu du jour.",
         price=3500,
         country="RDC",
@@ -186,10 +172,10 @@ KINSHASA_SERVICES = [
     ),
     Service(
         user_id=USERS[2].id,
-        title="Cours d'anglais pour enfants",
-        category=Category.SOUTIEN_SCOLAIRE,
-        description="Méthode ludique, petits groupes, niveau primaire.",
-        price=0,  # À discuter
+        title="Aide ménagère et lessive",
+        category=Category.AIDE_MENAGERE_LESSIVE,
+        description="Ménage hebdomadaire, repassage, lessive à la main.",
+        price=8000,
         country="RDC",
         city_village="Kinshasa",
         neighborhood="Lemba",
@@ -197,11 +183,23 @@ KINSHASA_SERVICES = [
         phone_number="+243831234567",
     ),
     Service(
+        user_id=USERS[1].id,
+        title="Menuiserie et soudure sur mesure",
+        category=Category.MENUISERIE_SOUDURE,
+        description="Portes, fenêtres, grilles, mobilier métallique.",
+        price=20000,
+        country="RDC",
+        city_village="Kinshasa",
+        neighborhood="Kintambo",
+        whatsapp_number="+243821234567",
+        phone_number="+243821234567",
+    ),
+    Service(
         user_id=USERS[0].id,
-        title="Maçonnerie et finitions",
-        category=Category.ELECTRICITE_MACONNERIE,
-        description="Crépi, carrelage, peinture. Équipe sérieuse.",
-        price=30000,
+        title="Mécanique auto et lavage moteur",
+        category=Category.MECANIQUE_AUTO_LAVAGE,
+        description="Vidange, freins, diagnostic, lavage complet.",
+        price=12000,
         country="RDC",
         city_village="Kinshasa",
         neighborhood="Kintambo",
@@ -211,7 +209,7 @@ KINSHASA_SERVICES = [
 ]
 
 
-# --- Brazzaville services (RC, FCFA) ---------------------------------------
+# --- Brazzaville services (RC, FCFA) - one per official category -----------
 
 BRAZZAVILLE_SERVICES = [
     Service(
@@ -229,7 +227,7 @@ BRAZZAVILLE_SERVICES = [
     Service(
         user_id=USERS[4].id,
         title="Dépannage électrique d'urgence",
-        category=Category.ELECTRICITE_MACONNERIE,
+        category=Category.REPARATIONS_TRAVAUX,
         description="Intervention rapide 7j/7 pour courts-circuits et pannes.",
         price=7000,
         country="RC",
@@ -254,8 +252,8 @@ BRAZZAVILLE_SERVICES = [
     ),
     Service(
         user_id=USERS[3].id,
-        title="Tonte de pelouse et élagage",
-        category=Category.JARDINAGE,
+        title="Tonte de pelouse et entretien",
+        category=Category.JARDINAGE_ENTRETIEN,
         description="Jardinier expérimenté, matériel fourni.",
         price=0,  # À discuter
         country="RC",
@@ -265,21 +263,9 @@ BRAZZAVILLE_SERVICES = [
         phone_number="+242061234567",
     ),
     Service(
-        user_id=USERS[4].id,
-        title="Pêche du jour au bord du fleuve",
-        category=Category.PECHE_CHASSE,
-        description="Silure, carpe, capitaine. Livraison possible.",
-        price=4000,
-        country="RC",
-        city_village="Brazzaville",
-        neighborhood="Makélékélé",
-        whatsapp_number="+242062234567",
-        phone_number="+242062234567",
-    ),
-    Service(
         user_id=USERS[5].id,
         title="Plats du jour maison",
-        category=Category.RESTAURATION_PROMO,
+        category=Category.RESTAURATION_BONS_PLANS,
         description="Saka-saka, poulet moambe, fumbwa. Commande la veille.",
         price=2500,
         country="RC",
@@ -314,10 +300,10 @@ BRAZZAVILLE_SERVICES = [
     ),
     Service(
         user_id=USERS[5].id,
-        title="Soutien scolaire en français",
-        category=Category.SOUTIEN_SCOLAIRE,
-        description="Grammaire, rédaction, lecture. Niveau collège.",
-        price=3500,
+        title="Lessive et repassage à domicile",
+        category=Category.AIDE_MENAGERE_LESSIVE,
+        description="Lessive soignée, repassage, livraison sous 48h.",
+        price=4000,
         country="RC",
         city_village="Brazzaville",
         neighborhood="Bacongo",
@@ -325,17 +311,29 @@ BRAZZAVILLE_SERVICES = [
         phone_number="+242063234567",
     ),
     Service(
+        user_id=USERS[4].id,
+        title="Soudure portails et grilles",
+        category=Category.MENUISERIE_SOUDURE,
+        description="Fabrication et pose de portails, grilles de sécurité.",
+        price=12000,
+        country="RC",
+        city_village="Brazzaville",
+        neighborhood="Makélékélé",
+        whatsapp_number="+242062234567",
+        phone_number="+242062234567",
+        status=ServiceStatus.ACTIVE,
+    ),
+    Service(
         user_id=USERS[3].id,
-        title="Construction mur d'enceinte",
-        category=Category.ELECTRICITE_MACONNERIE,
-        description="Briques, crépi, portail. Devis sur place.",
-        price=15000,
+        title="Lavage auto à la main",
+        category=Category.MECANIQUE_AUTO_LAVAGE,
+        description="Lavage extérieur et intérieur, polish, à votre adresse.",
+        price=3000,
         country="RC",
         city_village="Brazzaville",
         neighborhood="Makélékélé",
         whatsapp_number="+242061234567",
         phone_number="+242061234567",
-        status=ServiceStatus.ACTIVE,
     ),
 ]
 

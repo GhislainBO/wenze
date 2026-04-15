@@ -27,17 +27,21 @@ _LOG = logging.getLogger(__name__)
 # succeeds. Replaced when Phase 3 adds authentication.
 ANONYMOUS_USER_ID = "00000000-0000-0000-0000-000000000000"
 
-# Canonical French category labels (PRD section 3.2). Order matters: it's the
-# order shown in the Spinner dropdown.
+# Canonical French category labels - mirrors backend Category enum
+# (single source of truth in backend/app/models.py). Order matters:
+# it's the order shown in the Spinner dropdown. Keep in sync if the
+# backend list changes.
 CATEGORIES = (
     "Soutien scolaire",
-    "Électricité & Maçonnerie",
+    "Réparations & Travaux",
     "Beauté & Coiffure",
-    "Jardinage",
-    "Pêche & Chasse",
-    "Restauration & Promo",
+    "Jardinage & Entretien",
+    "Restauration & Bons plans",
     "Transport & Livraison",
     "Téléphone & Informatique",
+    "Aide ménagère & Lessive",
+    "Menuiserie & Soudure",
+    "Mécanique auto & Lavage",
 )
 
 _CATEGORY_PLACEHOLDER = "Choisir une catégorie"
